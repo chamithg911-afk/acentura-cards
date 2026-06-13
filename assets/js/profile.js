@@ -2,14 +2,49 @@ console.log("JS loaded");
 
 const orbit = document.getElementById("orbit");
 
-if (orbit) {
-  orbit.innerHTML = `
-    <div class="card" style="position:absolute; left:50%; top:50%; transform:translate(-50%, -50%);">
-      <img src="https://via.placeholder.com/80" />
-      <div class="name">Test User</div>
-      <div class="role">Developer</div>
-    </div>
-  `;
+async function fetchEmployees() {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/employees?select=*`,
+      {
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+      }
+    );
+
+    const data = await res.json();
+    console.log("Employees:", data);
+
+    renderCards(data);
+  } catch (err) {
+    console.error("Fetch error:", err);
+  }
 }
 
-console.log("Test card rendered");
+function renderCards(employees) {
+  if (!orbit) return;
+
+  orbit.innerHTML = "";
+
+  if (!employees || employees.length === 0) {
+    orbit.innerHTML = "<p>No employees found</p>";
+    return;
+  }
+
+  employees.forEach((emp, i) => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+      <img src="${emp.photo_url || ''}" />
+      <div class="name">${emp.full_name}</div>
+      <div class="role">${emp.role}</div>
+    `;
+
+    orbit.appendChild(card);
+  });
+}
+
+fetchEmployees();
