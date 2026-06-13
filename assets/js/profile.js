@@ -1,21 +1,11 @@
-alert("JS is working");
+console.log("JS loaded");
 
-console.log("profile.js loaded");
+const orbit = document.getElementById("orbit");
+const profile = document.getElementById("profile");
 
-window.addEventListener("DOMContentLoaded", () => {
-  init();
-});
-
-function init() {
-  console.log("DOM ready");
-
-  const orbit = document.getElementById("orbit");
-  const profile = document.getElementById("profile");
-
-  if (!orbit) {
-    console.error("Orbit div not found!");
-    return;
-  }
-
-  fetchEmployees();
+if (!orbit) {
+  console.error("Orbit div missing in HTML");
+} else {
+  orbit.innerHTML = "";
+  console.log("Orbit exists ✔");
 }
