@@ -259,33 +259,23 @@ async function saveEmployee() {
 // TOGGLE ACTIVE
 // ===========================
 
-async function toggleActive(id, status) {
-  const label = status ? 'activate' : 'deactivate';
-  if (!confirm(`Are you sure you want to ${label} this employee?`)) return;
-  await sbUpdate('employees', { is_active: status }, `id=eq.${id}`);
-  loadEmployees();
+async function sbStorageUpload(bucket, path, file) {
+  const res = await fetch(`${SUPABASE_URL}/storage/v1/object/${bucket}/${path}`, {
+    method: 'POST',
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      'Content-Type': file.type,
+      'x-upsert': 'true'
+    },
+    body: file
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error('Upload error:', errorText);
+    return null;
+  }
+
+  return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`;
 }
-
-// ===========================
-// DOWNLOAD QR
-// ===========================
-
-function downloadQR() {
-  const canvas = document.querySelector('#qrCode canvas');
-  if (!canvas) return;
-  const link = document.createElement('a');
-  link.download = `qr-${document.getElementById('fieldSlug').value}.png`;
-  link.href = canvas.toDataURL();
-  link.click();
-}
-
-// ===========================
-// INIT
-// ===========================
-
-document.addEventListener('DOMContentLoaded', checkSession);
-
-// Login on Enter key
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter') handleLogin();
-});
