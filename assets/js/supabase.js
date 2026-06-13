@@ -32,22 +32,25 @@ async function sbUpdate(table, data, params = '') {
   return res.json();
 }
 
-async function sbDelete(table, params = '') {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params}`, {
-    method: 'DELETE',
-    headers: sbHeaders
-  });
-  return res.ok;
-}
-
 async function sbStorageUpload(bucket, path, file) {
+  const formData = new FormData();
+  formData.append('', file);
+  
   const res = await fetch(`${SUPABASE_URL}/storage/v1/object/${bucket}/${path}`, {
     method: 'POST',
     headers: {
       'apikey': SUPABASE_ANON_KEY,
-      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      'x-upsert': 'true'
     },
     body: file
   });
+
+  if (!res.ok) {
+    const err = await res.json();
+    console.error('Upload error:', err);
+    return null;
+  }
+
   return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`;
 }
