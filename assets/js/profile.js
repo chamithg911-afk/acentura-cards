@@ -1,6 +1,9 @@
+const params = new URLSearchParams(window.location.search);
+const slug = params.get("slug");
+
 console.log("JS loaded");
 
-const orbit = document.getElementById("orbit");
+const container = document.getElementById("employee-container");
 
 async function fetchEmployees() {
   try {
@@ -15,8 +18,6 @@ async function fetchEmployees() {
     );
 
     const data = await res.json();
-    console.log("Employees:", data);
-
     renderCards(data);
   } catch (err) {
     console.error("Fetch error:", err);
@@ -24,16 +25,16 @@ async function fetchEmployees() {
 }
 
 function renderCards(employees) {
-  if (!orbit) return;
+  if (!container) return;
 
-  orbit.innerHTML = "";
+  container.innerHTML = "";
 
   if (!employees || employees.length === 0) {
-    orbit.innerHTML = "<p>No employees found</p>";
+    container.innerHTML = "<p>No employees found</p>";
     return;
   }
 
-  employees.forEach((emp, i) => {
+  employees.forEach((emp) => {
     const card = document.createElement("div");
     card.className = "card";
 
@@ -43,7 +44,7 @@ function renderCards(employees) {
       <div class="role">${emp.role}</div>
     `;
 
-    orbit.appendChild(card);
+    container.appendChild(card);
   });
 }
 
